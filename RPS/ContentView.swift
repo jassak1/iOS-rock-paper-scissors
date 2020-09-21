@@ -15,9 +15,9 @@ struct ContentView: View {
     @State var istrue=Bool.random()
     var tx: some View{
         Text(istrue ? "      WIN !" : "   LOOSE !")
-        .foregroundColor(.yellow)
-        .font(.largeTitle)
-        .fontWeight(.black)
+            .foregroundColor(.yellow)
+            .font(.largeTitle)
+            .fontWeight(.black)
     }
     @State var picked:Int=2
     var SFicons=["hammer.fill","doc.text.fill","scissors"]
@@ -26,6 +26,8 @@ struct ContentView: View {
     @State var randPick=Int.random(in: 0...2)
     @State var userCho=Int()
     @State var nextRnd:Bool=true
+    var infowin:String="CORRECT!"
+    var infoagain:String="TRY AGAIN!"
     var body: some View {
         ZStack {
             Color("Bckgrnd")
@@ -45,7 +47,7 @@ struct ContentView: View {
                     .padding(.top,20)
                     .padding(.bottom,50)
                 LinearGradient(gradient: Gradient(colors: istrue ? ([.green,.blue]) : ([.yellow,.red])), startPoint: .leading, endPoint: .trailing)
-                .frame(width: 160, height: 40)
+                    .frame(width: 160, height: 40)
                     .mask(tx)
                 Spacer()
             }
@@ -54,16 +56,18 @@ struct ContentView: View {
                 HStack(spacing:50) {
                     ForEach(0..<3) { Sitem in
                         Button(action:{
-                            if (Sitem==0){
-                                self.userCho=0
+                            if(self.nextRnd){
+                                switch Sitem {
+                                case 0:
+                                    self.iRock()
+                                case 1:
+                                    self.iPaper()
+                                case 2:
+                                    self.iScissors()
+                                default:
+                                    print("NA")
+                                }
                             }
-                            else if (Sitem==1){
-                                self.userCho=1
-                            }
-                            else{
-                                self.userCho=2
-                            }
-                            self.didWin()
                             self.nextRnd=false
                         }){
                             ZStack {
@@ -73,7 +77,7 @@ struct ContentView: View {
                                 Text(self.gamesets[Sitem])
                                     .foregroundColor(.pink)
                                     .fontWeight(.black)
-                                .font(.body)
+                                    .font(.body)
                             }
                         }
                     }
@@ -105,97 +109,43 @@ struct ContentView: View {
         }
         
     }
-  
-    func didWin() {
-        if(nextRnd){
-        switch userCho {
-        case 0:                 // USER CHOOSES ROCK
-            switch randPick {
-            case 0:
-                infotainment="NOPE! THAT WAS MATCH."
-                (score>0) ? score-=1 : (score=0)
-            case 1:
-                switch istrue {
-                case true:
-                    infotainment="TRY AGAIN!"
-                    (score>0) ? score-=1 : (score=0)
-                case false:
-                    infotainment="CORRECT!"
-                    score+=1
-                }
-            case 2:
-                switch istrue {
-                case true:
-                    infotainment="CORRECT!"
-                    score+=1
-                case false:
-                    infotainment="TRY AGAIN!"
-                    (score>0) ? score-=1 : (score=0)
-                }
-            default:
-                print("NA")
-            }
-            
-        case 1:                 // USER CHOOSES PAPER
-            switch randPick {
-            case 1:
-                infotainment="NOPE! THAT WAS MATCH."
-                (score>0) ? score-=1 : (score=0)
-            case 2:
-                switch istrue {
-                case true:
-                    infotainment="TRY AGAIN!"
-                    (score>0) ? score-=1 : (score=0)
-                case false:
-                    infotainment="CORRECT!"
-                    score+=1
-                }
-            case 0:
-                switch istrue {
-                case true:
-                    infotainment="CORRECT!"
-                    score+=1
-                case false:
-                    infotainment="TRY AGAIN!"
-                    (score>0) ? score-=1 : (score=0)
-                }
-            default:
-                print("NA")
-            }
-            
-        case 2:                 // USER CHOOSES SCISSORS
-            switch randPick {
-            case 2:
-                infotainment="NOPE! THAT WAS MATCH"
-                (score>0) ? score-=1 : (score=0)
-            case 0:
-                switch istrue {
-                case true:
-                    infotainment="TRY AGAIN!"
-                    (score>0) ? score-=1 : (score=0)
-                case false:
-                    infotainment="CORRECT!"
-                    score+=1
-                }
-            case 1:
-                switch istrue {
-                case true:
-                    infotainment="CORRECT!"
-                    score+=1
-                case false:
-                    infotainment="TRY AGAIN!"
-                    (score>0) ? score-=1 : (score=0)
-                }
-            default:
-                print("NA")
-            }
-            
-        default:
-            print("NA")
+    
+    func shwin(){
+        score+=1
+        infotainment=infowin
+    }
+    func shagain(){
+        (score>0) ? score-=1 : (score=0)
+        infotainment=infoagain
+    }
+    
+    func iRock(){
+        if((randPick==2 && istrue) || (randPick==1 && !istrue)){
+            shwin()
         }
+        else{
+            shagain()
         }
     }
-  
+    
+    func iPaper(){
+        if((randPick==0 && istrue) || (randPick==2 && !istrue)){
+            shwin()
+        }
+        else{
+            shagain()
+        }
+    }
+    
+    func iScissors(){
+        if((randPick==0 && !istrue) || (randPick==1 && istrue)){
+            shwin()
+        }
+        else{
+            shagain()
+        }
+    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
